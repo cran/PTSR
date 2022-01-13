@@ -1,0 +1,14 @@
+532507700fd4214788da5996df32eeff *DESCRIPTION
+0680ae81112b2cb36642c4402d5865d8 *NAMESPACE
+23f44f8499d2ca19feac849eff4beac2 *R/distributions.R
+7f0ed5f586fcb96dd696005db01a6311 *R/fit.R
+361ab118c0de9ce69294f18856e53470 *R/link.R
+49f9ebcd2f4cdaff9bdea1b24888633a *R/pred.R
+032ae411480e873dbdedc45933e98353 *R/sim.R
+cb08b332d9efdd8965397963a20be064 *man/ddist.Rd
+a98f776e7189dd36300f0f29486f0b8f *man/predict.ptsr.Rd
+229d6ab2b7d67018e2f15a6ec88a30e3 *man/print.ptsr.Rd
+c439b18f4092c2bf675665f690b12865 *man/ptsr.fit.Rd
+72f307f1aabe9356075dd39a66e8d965 *man/ptsr.link.Rd
+c693af22aaabe039740eb66926c3fb17 *man/ptsr.sim.Rd
+0d0b925ff3d85e7d2a8c9e2984eb4f86 *man/summary.Rd

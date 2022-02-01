@@ -92,9 +92,57 @@
   # if ddist does not have a varphi parameter, this value will be
   # ignored by the function so there is no problem on setting varphi = par[length(par)]
   sll <- .ll(yt, mu = temp$mut, varphi = par[length(par)], ddist = ddist)
+	if(is.infinite(sll)) sll = ifelse(sll > 0, 2.2e+10, -2.2e+10)
+	if(is.nan(sll)) sll = 2.2e+10
   return(sll)
 }
 
+#  internal function
+#  calculates the hessian matrix
+.hessian <- function(object, eps){
+
+  temp <- object$model
+  par <- object$coefficients
+
+  out = matrix(0, ncol = length(par), nrow = length(par))
+  for(k in 1:length(par)){
+    for(j in 1:k){
+
+      par1 <- par2 <- par3 <- par4 <- par
+      par1[k] = par1[k] + eps;  par1[j] = par1[j] + eps
+      par2[k] = par2[k] + eps;  par2[j] = par2[j] - eps
+      par3[k] = par3[k] - eps;  par3[j] = par3[j] + eps
+      par4[k] = par4[k] - eps;  par4[j] = par4[j] - eps
+
+      f1 <-  .loglike(par = par1, a = temp$a, xreg = object$xreg,
+                      xregar = temp$xregar, b = temp$b, yt = object$series,
+                      p = temp$p, q = temp$q, arlag = temp$arlag,
+                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+                      g1.inv = temp$g1.inv, g2 = temp$g2)
+
+      f2 <-  .loglike(par = par2, a = temp$a, xreg = object$xreg,
+                      xregar = temp$xregar, b = temp$b, yt = object$series,
+                      p = temp$p, q = temp$q, arlag = temp$arlag,
+                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+                      g1.inv = temp$g1.inv, g2 = temp$g2)
+
+      f3 <-  .loglike(par = par3, a = temp$a, xreg = object$xreg,
+                      xregar = temp$xregar, b = temp$b, yt = object$series,
+                      p = temp$p, q = temp$q, arlag = temp$arlag,
+                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+                      g1.inv = temp$g1.inv, g2 = temp$g2)
+
+      f4 <-  .loglike(par = par4, a = temp$a, xreg = object$xreg,
+                      xregar = temp$xregar, b = temp$b, yt = object$series,
+                      p = temp$p, q = temp$q, arlag = temp$arlag,
+                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+                      g1.inv = temp$g1.inv, g2 = temp$g2)
+
+      out[k,j] = out[j,k] = (f1 - f2 -f3 + f4)/(4*eps^2)
+    }
+  }
+  out
+}
 
 #' Title Function to fit a PTSR model
 #'
@@ -285,10 +333,18 @@ summary.ptsr <- function(object,...) {
                           arlag = temp$arlag, malag = temp$malag,
                           ddist = temp$ddist, g1 = temp$g1,
                           g1.inv = temp$g1.inv, g2 = temp$g2)
-  sv <- try(solve(hs))
+  sv <- try(solve(hs), silent=TRUE)
   if ("try-error" %in% class(sv)) {
-    print("Error - Returning the hessian")
-    return(hs)
+	  cat("\n----------------\n",
+		"numDeriv::hessian failed.\n",
+		"Using .hessian from PTSR instead.\n",
+		"----------------\n")
+    hs <- .hessian(object, eps = 1e-4)
+    sv <- try(solve(hs))
+    if ("try-error" %in% class(sv)){
+      print("Error calculating the inverse - Returning the hessian matrix")
+      return(hs)
+    }
   }
 
   npar <- length(object$coefficients)

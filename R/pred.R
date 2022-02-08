@@ -67,7 +67,8 @@ predict.ptsr <-
       }
 
       temp <- .ptsr.predict(par = object$coefficients,
-                            h = nnew, xnew = xnew, yt = object$series,
+                            h = nnew, xreg = object$xreg,
+														xnew = xnew, yt = object$series,
                             mut = object$fitted.values,
                             epst = object$residuals,
                             model = object$model)
@@ -95,7 +96,7 @@ predict.ptsr <-
   a = model$a
   b = model$b
   arlag = model$arlag
-  malag = model$arlag
+  malag = model$malag
   g1 = model$g1
   g1.inv = model$g1.inv
   g2 = model$g2

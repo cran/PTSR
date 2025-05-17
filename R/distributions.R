@@ -19,16 +19,18 @@
 #' @order 1
 #'
 #' @description
-#' Density function and random numbers generation for models with support on the positive real line.
-#'
-#' @details
+#' Density function and random numbers generation for models with support on the
+#' positive real line.
 #'
 #' @return
-#' For any avaliable \code{dist}, \code{ddist} gives the density and \code{rdist} generates random deviates.
+#' For any avaliable \code{dist}, \code{ddist} gives the density and
+#' \code{rdist} generates random deviates.
 #'
-#' The length of the result is determined by \code{n} for \code{rdist}, and is the maximum of the lengths of the numerical arguments for \code{rdist}.
+#' The length of the result is determined by \code{n} for \code{rdist}, and is
+#' the maximum of the lengths of the numerical arguments for \code{rdist}.
 #'
-#' The numerical arguments other than \code{n} are recycled to the length of the result. Only the first elements of the logical arguments are used.
+#' The numerical arguments other than \code{n} are recycled to the length of the
+#' result. Only the first elements of the logical arguments are used.
 #'
 #' @md
 NULL
@@ -36,8 +38,7 @@ NULL
 
 
 
-############################################################# Reparametrized Beta-Prime Distribution
-############################################################
+###### Reparametrized Beta-Prime Distribution ##########
 #' @rdname ddist
 #' @aliases d.betap
 #' @order 2
@@ -48,19 +49,23 @@ NULL
 #' @param log logical; if TRUE, probabilities \eqn{p} are given as \eqn{log(p)}.
 #'
 #' @details
+#'
 #' \itemize{
-#'   \item For the reparametrized Beta-Prime distribution, the functions [dbetapr][extraDistr::dbetapr] and [rbetapr][extraDistr::rbetapr] are imported from the package \code{\link{extraDistr}}. The following holds
+#'   \item For the reparametrized Beta-Prime distribution, the functions
+#'   [dbetapr][extraDistr::dbetapr] and [rbetapr][extraDistr::rbetapr] are
+#'   imported from the \code{extraDistr} package. The following holds
 #'   \deqn{shape1 = mu*varphi}
 #'   \deqn{shape2 = varphi + 1}
 #'   \deqn{scale = 1}
 #'   }
 #'
 #' @export
+#' @importFrom extraDistr dbetapr rbetapr
 #' @md
-d.betap <- function(x, mu, varphi, log = FALSE){
-  shape1 = mu*varphi
-  shape2 = varphi + 1
-  return(extraDistr::dbetapr(x = x, shape1 = shape1, shape2 = shape2, scale = 1, log = log))
+d.betap <- function(x, mu, varphi, log = FALSE) {
+  shape1 <- mu * varphi
+  shape2 <- varphi + 1
+  return(dbetapr(x = x, shape1 = shape1, shape2 = shape2, scale = 1, log = log))
 }
 
 #' @rdname ddist
@@ -69,10 +74,10 @@ d.betap <- function(x, mu, varphi, log = FALSE){
 #' @param n sample size
 #' @export
 #' @md
-r.betap <- function(n, mu, varphi){
-  shape1 = mu*varphi
-  shape2 = varphi + 1
-  return(extraDistr::rbetapr(n = n, shape1 = shape1, shape2 = shape2, scale = 1))
+r.betap <- function(n, mu, varphi) {
+  shape1 <- mu * varphi
+  shape2 <- varphi + 1
+  return(rbetapr(n = n, shape1 = shape1, shape2 = shape2, scale = 1))
 }
 
 ############################################################
@@ -83,8 +88,11 @@ r.betap <- function(n, mu, varphi){
 #' @order 4
 #'
 #' @details
+#'
 #' \itemize{
-#'   \item For the reparametrized F distribution, the functions [df][stats::df] and  [rf][stats::rf] are imported from \code{\link{stats}}. The following holds
+#'   \item For the reparametrized F distribution, the functions [df][stats::df]
+#'   and  [rf][stats::rf] are imported from \code{\link{stats}}. The following
+#'   holds
 #'   \deqn{df1 = varphi}
 #'   \deqn{df2 = 2*mu/(mu - 1)}
 #'   so that the parameter \eqn{\mu} must satisfy \eqn{\mu > 1}.
@@ -92,9 +100,9 @@ r.betap <- function(n, mu, varphi){
 #'
 #' @export
 #' @md
-d.F <- function(x, mu, varphi, log = FALSE){
-  df1 = varphi
-  df2 = 2*mu/(mu - 1)
+d.F <- function(x, mu, varphi, log = FALSE) {
+  df1 <- varphi
+  df2 <- 2 * mu / (mu - 1)
   return(stats::df(x = x, df1 = df1, df2 = df2, log = log))
 }
 
@@ -102,11 +110,12 @@ d.F <- function(x, mu, varphi, log = FALSE){
 #' @aliases r.F
 #' @order 5
 #' @export
+#' @importFrom stats rf
 #' @md
-r.F <- function(n, mu, varphi){
-  df1 = varphi
-  df2 = 2*mu/(mu - 1)
-  return(stats::rf(n = n, df1 = df1, df2 = df2))
+r.F <- function(n, mu, varphi) {
+  df1 <- varphi
+  df2 <- 2 * mu / (mu - 1)
+  return(rf(n = n, df1 = df1, df2 = df2))
 }
 
 
@@ -118,6 +127,7 @@ r.F <- function(n, mu, varphi){
 #' @order 6
 #'
 #' @details
+#'
 #' \itemize{
 #'   \item For the reparametrized Gamma distribution, the functions [dgamma][stats::dgamma] and  [rgamma][stats::rgamma] are imported from \code{\link{stats}}. The following holds
 #'   \deqn{shape = varphi}
@@ -125,11 +135,12 @@ r.F <- function(n, mu, varphi){
 #'   }
 #'
 #' @export
+#' @importFrom stats dgamma rgamma
 #' @md
-d.gamma <- function(x, mu, varphi, log = FALSE){
-  shape = varphi
-  rate = varphi/mu
-  return(stats::dgamma(x = x, shape = shape, rate = rate, log = log))
+d.gamma <- function(x, mu, varphi, log = FALSE) {
+  shape <- varphi
+  rate <- varphi / mu
+  return(dgamma(x = x, shape = shape, rate = rate, log = log))
 }
 
 #' @rdname ddist
@@ -138,9 +149,9 @@ d.gamma <- function(x, mu, varphi, log = FALSE){
 #' @export
 #' @md
 r.gamma <- function(n, mu, varphi) {
-  shape = varphi
-  rate = varphi/mu
-  return(stats::rgamma(n = n, shape = shape, rate = rate))
+  shape <- varphi
+  rate <- varphi / mu
+  return(rgamma(n = n, shape = shape, rate = rate))
 }
 
 
@@ -152,18 +163,22 @@ r.gamma <- function(n, mu, varphi) {
 #' @order 8
 #'
 #' @details
+#'
 #' \itemize{
-#'   \item For the reparametrized Inverse Gaussian distribution, the functions [dinvGauss][SuppDists::dinvGauss] and [rinvGauss][SuppDists::rinvGauss] are imported from \code{SuppDists}. The following holds
+#'   \item For the reparametrized Inverse Gaussian distribution, the functions
+#'   [dinvGauss][SuppDists::dinvGauss] and [rinvGauss][SuppDists::rinvGauss] are
+#'   imported from the \code{SuppDists} package. The following holds
 #'   \deqn{nu = mu}
 #'   \deqn{lambda = 1/varphi}
 #'   }
 #'
 #' @export
+#' @importFrom SuppDists dinvGauss rinvGauss
 #' @md
-d.invGauss <- function(x, mu, varphi, log = FALSE){
-  nu = mu
-  lambda = 1/varphi
-  return(SuppDists::dinvGauss(x = x, nu = nu, lambda = lambda, log = log))
+d.invGauss <- function(x, mu, varphi, log = FALSE) {
+  nu <- mu
+  lambda <- 1 / varphi
+  return(dinvGauss(x = x, nu = nu, lambda = lambda, log = log))
 }
 
 #' @rdname ddist
@@ -171,10 +186,10 @@ d.invGauss <- function(x, mu, varphi, log = FALSE){
 #' @order 9
 #' @export
 #' @md
-r.invGauss <- function(n, mu, varphi){
-  nu = mu
-  lambda = 1/varphi
-  return(SuppDists::rinvGauss(n = n, nu = nu, lambda = lambda))
+r.invGauss <- function(n, mu, varphi) {
+  nu <- mu
+  lambda <- 1 / varphi
+  return(rinvGauss(n = n, nu = nu, lambda = lambda))
 }
 
 
@@ -186,18 +201,22 @@ r.invGauss <- function(n, mu, varphi){
 #' @order 10
 #'
 #' @details
+#'
 #' \itemize{
-#'   \item For the reparametrized Log-logistic distribution, the functions [dllogis][actuar::dllogis] and [rllogis][actuar::rllogis] a are imported from \code{actuar}. The following holds
+#'   \item For the reparametrized Log-logistic distribution, the functions
+#'   [dllogis][actuar::dllogis] and [rllogis][actuar::rllogis] a are imported
+#'   from the \code{actuar} package. The following holds
 #'   \deqn{shape = varphi}
 #'   \deqn{rate = (pi/varphi)/(mu*sin(pi/varphi))}
 #'   }
 #'
 #' @export
+#' @importFrom actuar dllogis rllogis
 #' @md
-d.logLogis <- function(x, mu, varphi, log = FALSE){
-  shape = varphi
-  rate = (pi/varphi)/(mu*sin(pi/varphi))
-  return(actuar::dllogis(x = x, shape = shape, rate = rate, log = log))
+d.logLogis <- function(x, mu, varphi, log = FALSE) {
+  shape <- varphi
+  rate <- (pi / varphi) / (mu * sin(pi / varphi))
+  return(dllogis(x = x, shape = shape, rate = rate, log = log))
 }
 
 #' @rdname ddist
@@ -205,10 +224,10 @@ d.logLogis <- function(x, mu, varphi, log = FALSE){
 #' @order 11
 #' @export
 #' @md
-r.logLogis <- function(n, mu, varphi){
-  shape = varphi
-  rate = (pi/varphi)/(mu*sin(pi/varphi))
-  return(actuar::rllogis(n = n, shape = shape, rate = rate))
+r.logLogis <- function(n, mu, varphi) {
+  shape <- varphi
+  rate <- (pi / varphi) / (mu * sin(pi / varphi))
+  return(rllogis(n = n, shape = shape, rate = rate))
 }
 
 
@@ -220,18 +239,22 @@ r.logLogis <- function(n, mu, varphi){
 #' @order 12
 #'
 #' @details
+#'
 #' \itemize{
-#'   \item For the reparametrized Log-Normal distribution, the functions [dlnorm][stats::dlnorm] and [rlnorm][stats::rlnorm] are imported from \code{\link{stats}}. The following holds
+#'   \item For the reparametrized Log-Normal distribution, the functions
+#'   [dlnorm][stats::dlnorm] and [rlnorm][stats::rlnorm] are imported from
+#'   \code{\link{stats}}. The following holds
 #'   \deqn{meanlog = log(mu) - varphi^2/2}
 #'   \deqn{sdlog = varphi}
 #'   }
 #'
 #' @export
+#' @importFrom stats dlnorm rlnorm
 #' @md
-d.logNorm <- function(x, mu, varphi, log = FALSE){
-  meanlog = log(mu) - varphi^2/2
-  sdlog = varphi
-  return(stats::dlnorm(x = x, meanlog = meanlog, sdlog = sdlog, log = log))
+d.logNorm <- function(x, mu, varphi, log = FALSE) {
+  meanlog <- log(mu) - varphi^2 / 2
+  sdlog <- varphi
+  return(dlnorm(x = x, meanlog = meanlog, sdlog = sdlog, log = log))
 }
 
 #' @rdname ddist
@@ -239,10 +262,10 @@ d.logNorm <- function(x, mu, varphi, log = FALSE){
 #' @order 13
 #' @export
 #' @md
-r.logNorm <- function(n, mu, varphi){
-  meanlog = log(mu) - varphi^2/2
-  sdlog = varphi
-  return(stats::rlnorm(n = n, meanlog = meanlog, sdlog = sdlog))
+r.logNorm <- function(n, mu, varphi) {
+  meanlog <- log(mu) - varphi^2 / 2
+  sdlog <- varphi
+  return(rlnorm(n = n, meanlog = meanlog, sdlog = sdlog))
 }
 
 
@@ -254,16 +277,20 @@ r.logNorm <- function(n, mu, varphi){
 #' @order 14
 #'
 #' @details
+#'
 #' \itemize{
-#'   \item For the reparametrized Chi-squared F distribution, the functions [dchisq][stats::dchisq] and [rchisq][stats::rchisq] are imported from \code{\link{stats}}. The following holds
+#'   \item For the reparametrized Chi-squared F distribution, the functions
+#'   [dchisq][stats::dchisq] and [rchisq][stats::rchisq] are imported from
+#'   \code{\link{stats}}. The following holds
 #'   \deqn{df = mu}
 #'   }
 #'
 #' @export
+#' @importFrom stats dchisq rchisq
 #' @md
-d.chi <- function(x, mu, log = FALSE,...){
-  df = mu
-  return(stats::dchisq(x = x, df = df, log = log))
+d.chi <- function(x, mu, log = FALSE, ...) {
+  df <- mu
+  return(dchisq(x = x, df = df, log = log))
 }
 
 #' @rdname ddist
@@ -272,9 +299,9 @@ d.chi <- function(x, mu, log = FALSE,...){
 #' @param ... for compatibility with other functions
 #' @export
 #' @md
-r.chi <- function(n, mu, ...){
-  df = mu
-  return(stats::rchisq(n = n, df = df))
+r.chi <- function(n, mu, ...) {
+  df <- mu
+  return(rchisq(n = n, df = df))
 }
 
 
@@ -287,15 +314,19 @@ r.chi <- function(n, mu, ...){
 #'
 #' @details
 #' \itemize{
-#'   \item For the reparametrized Rayleigh distribution, the functions [drayleigh][extraDistr::drayleigh] and [rrayleigh][extraDistr::rrayleigh] are imported from \code{\link{extraDistr}}. The following holds
-#'   \deqn{sigma = mu/sqrt(pi/2)}
+#'   \item For the reparametrized Rayleigh distribution, the functions
+#'   [drayleigh][extraDistr::drayleigh] and [rrayleigh][extraDistr::rrayleigh]
+#'   are imported from \code{extraDistr} package. The following holds
+#'   \deqn{
+#'   sigma = mu/sqrt(pi/2)}
 #'   }
 #'
 #' @export
+#' @importFrom extraDistr drayleigh rrayleigh
 #' @md
-d.ray <- function(x, mu, log = FALSE,...){
-  sigma = mu/sqrt(pi/2)
-  return(extraDistr::drayleigh(x = x, sigma = sigma, log = log))
+d.ray <- function(x, mu, log = FALSE, ...) {
+  sigma <- mu / sqrt(pi / 2)
+  return(drayleigh(x = x, sigma = sigma, log = log))
 }
 
 #' @rdname ddist
@@ -303,8 +334,7 @@ d.ray <- function(x, mu, log = FALSE,...){
 #' @order 17
 #' @export
 #' @md
-r.ray <- function(n, mu, ...){
-  sigma = mu/sqrt(pi/2)
-  return(extraDistr::rrayleigh(n = n, sigma = sigma))
+r.ray <- function(n, mu, ...) {
+  sigma <- mu / sqrt(pi / 2)
+  return(rrayleigh(n = n, sigma = sigma))
 }
-

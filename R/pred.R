@@ -32,52 +32,54 @@
 #'
 #'  \item{error}{The error term}
 #'
-#'  \item{residuals}{The (in-sample) residuals, that is, the observed minus the predicted values.}
+#'  \item{residuals}{The (in-sample) residuals, that is, the observed minus the
+#'  predicted values.}
 #'
 #'  \item{forecast}{The predicted values for yt.}
 #'
 ##' @export
 predict.ptsr <-
-  function(object, newdata, nnew = 0,...){
-
+  function(object, newdata, nnew = 0, ...) {
     out <- list()
     nms.out <- c("series", "xreg", "fitted.values", "residuals")
 
-    if(missing(newdata)) newdata = NULL
+    if (missing(newdata)) newdata <- NULL
 
-    if(is.null(newdata) & nnew <= 0){
+    if (is.null(newdata) & nnew <= 0) {
       #------------------------------------------------------
       # New data was not provided.
       # Extracting existing components and returning
       #------------------------------------------------------
       out[nms.out] <- object[nms.out]
-    }else{
-
-      if(is.null(newdata) & object$model$b > 0)
+    } else {
+      if (is.null(newdata) & object$model$b > 0) {
         stop("Please, provide the new values for the regressors")
+      }
 
       #------------------------------------------------------
       # New data was provided.
       # Making the necessary calculations
       #------------------------------------------------------
-      xnew = NULL
-      if(!is.null(newdata)){
-        xnew = as.matrix(newdata)
-        nnew = nrow(xnew)
+      xnew <- NULL
+      if (!is.null(newdata)) {
+        xnew <- as.matrix(newdata)
+        nnew <- nrow(xnew)
       }
 
-      temp <- .ptsr.predict(par = object$coefficients,
-                            h = nnew, xreg = object$xreg,
-														xnew = xnew, yt = object$series,
-                            mut = object$fitted.values,
-                            epst = object$residuals,
-                            model = object$model)
+      temp <- .ptsr.predict(
+        par = object$coefficients,
+        h = nnew, xreg = object$xreg,
+        xnew = xnew, yt = object$series,
+        mut = object$fitted.values,
+        epst = object$residuals,
+        model = object$model
+      )
 
 
       out[nms.out] <- object[nms.out]
       out$forecast <- temp
       out$xnew <- NULL
-      if(object$model$b > 0) out$xnew <- xnew
+      if (object$model$b > 0) out$xnew <- xnew
     }
     out
   }
@@ -86,74 +88,76 @@ predict.ptsr <-
 # Internal function.
 # Calculates out-of-sample predicted values
 .ptsr.predict <- function(par, h, xreg, xnew, yt, mut, epst, model) {
+  n <- length(yt)
+  mut <- c(mut, numeric(h))
+  epst <- c(epst, numeric(h))
 
-  n = length(yt)
-  mut = c(mut, numeric(h))
-  epst  = c(epst, numeric(h))
+  p <- model$p
+  q <- model$q
+  a <- model$a
+  b <- model$b
+  arlag <- model$arlag
+  malag <- model$malag
+  g1 <- model$g1
+  g1.inv <- model$g1.inv
+  g2 <- model$g2
 
-  p = model$p
-  q = model$q
-  a = model$a
-  b = model$b
-  arlag = model$arlag
-  malag = model$malag
-  g1 = model$g1
-  g1.inv = model$g1.inv
-  g2 = model$g2
+  g2y <- c(g2(yt), numeric(h))
+  yt <- c(yt, numeric(h))
 
-  g2y = c(g2(yt), numeric(h))
-  yt = c(yt, numeric(h))
-
-  alpha = 0
-  beta = 0
-  l = 0
-  if (a == 1) {alpha = par[1]; l = l + 1}
-  if (b > 0) {beta = par[(l + 1):(l + b)]; l = l + b}
+  alpha <- 0
+  beta <- 0
+  l <- 0
+  if (a == 1) {
+    alpha <- par[1]
+    l <- l + 1
+  }
+  if (b > 0) {
+    beta <- par[(l + 1):(l + b)]
+    l <- l + b
+  }
   if (p > 0) {
     if (is.null(arlag)) {
-      phi = par[(l + 1):(l + p)]
-      l = l + p
-    }
-    else {
-      phi = numeric(p)
-      phi[arlag] = par[(l + 1):(l + length(arlag))]
-      l = l + length(arlag)
+      phi <- par[(l + 1):(l + p)]
+      l <- l + p
+    } else {
+      phi <- numeric(p)
+      phi[arlag] <- par[(l + 1):(l + length(arlag))]
+      l <- l + length(arlag)
     }
   }
   if (q > 0) {
     if (is.null(arlag)) {
-      theta = par[(l + 1):(l + q)]
-      l = l + q
-    }
-    else{
-      theta = numeric(q)
-      theta[malag] = par[(l + 1):(l + length(malag))]
-      l = l + length(malag)
+      theta <- par[(l + 1):(l + q)]
+      l <- l + q
+    } else {
+      theta <- numeric(q)
+      theta[malag] <- par[(l + 1):(l + length(malag))]
+      l <- l + length(malag)
     }
   }
 
-  XB = numeric(n+h)
-  if (!is.null(xnew)){
-	  xtemp = rbind(as.matrix(xreg), as.matrix(xnew))
-		XB = xtemp %*% beta
-	}
+  XB <- numeric(n + h)
+  if (!is.null(xnew)) {
+    xtemp <- rbind(as.matrix(xreg), as.matrix(xnew))
+    XB <- xtemp %*% beta
+  }
 
   for (t in 1:h) {
-    ls = alpha + XB[n+t]
+    ls <- alpha + XB[n + t]
     if (p > 0) {
-      xr = 0
-      if (model$xregar) xr = XB[(n + t) - c(1:p)]
-      temp = sum(phi * (g2y[(n + t) - c(1:p)] - xr))
-      ls = ls + temp
+      xr <- 0
+      if (model$xregar) xr <- XB[(n + t) - c(1:p)]
+      temp <- sum(phi * (g2y[(n + t) - c(1:p)] - xr))
+      ls <- ls + temp
     }
-    if (q > 0) ls = ls + sum(theta * epst[(n + t) - (1:q)])
-    mut[n + t] = g1.inv(ls)
-    yt[n + t] = mut[n + t]
-    g2y[n+t] = g2(mut[n + t])
+    if (q > 0) ls <- ls + sum(theta * epst[(n + t) - (1:q)])
+    mut[n + t] <- g1.inv(ls)
+    yt[n + t] <- mut[n + t]
+    g2y[n + t] <- g2(mut[n + t])
   }
 
-  ynew = yt[(n + 1):(n + h)]
+  ynew <- yt[(n + 1):(n + h)]
 
   invisible(ynew)
 }
-

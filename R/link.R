@@ -60,7 +60,7 @@ ptsr.link <- function(link = "log"){
     switch(link,
            log = 1/mu,
            log1 = 1/(mu - 1),
-           identity = 1
+           identity = rep(1, length(mu))
     )
   }
 

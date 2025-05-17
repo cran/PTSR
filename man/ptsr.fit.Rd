@@ -2,7 +2,7 @@
 % Please edit documentation in R/fit.R
 \name{ptsr.fit}
 \alias{ptsr.fit}
-\title{Title Function to fit a PTSR model}
+\title{Function to fit a PTSR model}
 \usage{
 ptsr.fit(start, yt, xreg = NULL, xregar = TRUE, fit.alpha = TRUE,
   p = 0, q = 0, arlag = NULL, malag = NULL, ddist = d.gamma,
@@ -15,39 +15,50 @@ of the model.}
 
 \item{yt}{the time series}
 
-\item{xreg}{optionally, a vector or matrix of external regressors. Default is \code{NULL}}
+\item{xreg}{optionally, a vector or matrix of external regressors. Default is
+\code{NULL}}
 
-\item{xregar}{logical, if \code{FALSE}, the regressors are not included in the
-AR component of the model. Default is \code{TRUE}.}
+\item{xregar}{logical, if \code{FALSE}, the regressors are not included in
+the AR component of the model. Default is \code{TRUE}.}
 
-\item{fit.alpha}{logical, if FALSE, alpha is set to zero. Default is \code{TRUE}}
+\item{fit.alpha}{logical, if FALSE, alpha is set to zero. Default is
+\code{TRUE}}
 
 \item{p}{order of the AR polinomial}
 
 \item{q}{order of the MA polinomial}
 
-\item{arlag}{the lags to be included in the AR polinomial. Default is \code{NULL}, meaning that all lags will be included.}
+\item{arlag}{the lags to be included in the AR polinomial. Default is
+\code{NULL}, meaning that all lags will be included.}
 
-\item{malag}{the lags to be included in the MA polinomial. Default is \code{NULL}, meaning that all lags will be included.}
+\item{malag}{the lags to be included in the MA polinomial. Default is
+\code{NULL}, meaning that all lags will be included.}
 
 \item{ddist}{function, the density function to be used}
 
-\item{link1}{character indicating which link must be used for \eqn{\mu_t}.  See \code{\link{ptsr.link}} for available links. Default is \sQuote{log}.}
+\item{link1}{character indicating which link must be used for \eqn{\mu_t}.
+See \code{\link{ptsr.link}} for available links. Default is \sQuote{log}.}
 
-\item{link2}{character indicating which link must be used for \eqn{y_t} in the AR recursion.  See \code{\link{ptsr.link}} for available links. Default is \sQuote{identity}.}
+\item{link2}{character indicating which link must be used for \eqn{y_t} in
+the AR recursion.  See \code{\link{ptsr.link}} for available links. Default
+is \sQuote{identity}.}
 
-\item{g1}{optionally, a link function to be used  for \eqn{\mu_t}. Default is \code{NULL}, so that it is calculated internally, using \code{link1}.}
+\item{g1}{optionally, a link function to be used  for \eqn{\mu_t}. Default is
+\code{NULL}, so that it is calculated internally, using \code{link1}.}
 
-\item{g1.inv}{optionally, a the inverse link function to be used  for \eqn{\eta_t}. It must the the ivnerse of \code{g1}. Default is \code{NULL}, so that it is calculated internally, using \code{link1}.}
+\item{g1.inv}{optionally, a the inverse link function to be used  for
+\eqn{\eta_t}. It must the the ivnerse of \code{g1}. Default is \code{NULL},
+so that it is calculated internally, using \code{link1}.}
 
-\item{g2}{optionally, a link function to be used  for \eqn{y_t}. Default is \code{NULL}, so that it is calculated internally, using \code{link2}.}
+\item{g2}{optionally, a link function to be used  for \eqn{y_t}. Default is
+\code{NULL}, so that it is calculated internally, using \code{link2}.}
 
 \item{method}{The method to be used. See [optim][stats::optim] for details.}
 
 \item{...}{Further arguments to be passed to \code{optim}.}
 }
 \value{
-The same arguments return by \code{optim} plus a the  following arguments
+The same arguments return by \code{optim} plus the following arguments
 \itemize{
    \item \code{coefficients}: a vector with the estimated coefficients;
    \item \code{sll}: the sum of the log-likelihood for the fitted model;
@@ -60,7 +71,7 @@ the in-sample forecast, also denoted fitted values;
 }
 }
 \description{
-Title Function to fit a PTSR model
+Fit a PTSR model to a univariate time series.
 }
 \examples{
 
@@ -68,23 +79,29 @@ Title Function to fit a PTSR model
 # Gamma-ARMA(1,1) model with no regressors
 #-------------------------------------------------------------------
 
-simu = ptsr.sim(n = 3000, burn = 50,
-                varphi = 20, alpha = 0,
-                phi = 0.35, theta = 0.2,
-                seed = 1234, rdist = r.gamma,
-                link1 = "log", link2 = "log")
+simu <- ptsr.sim(
+  n = 3000, burn = 50,
+  varphi = 20, alpha = 0,
+  phi = 0.35, theta = 0.2,
+  seed = 1234, rdist = r.gamma,
+  link1 = "log", link2 = "log"
+)
 
-fit1 = ptsr.fit(start =  c(0,0,0,10), yt = simu$yt,
-               fit.alpha = TRUE, p = 1, q = 1,
-               ddist = d.gamma, link1 = "log",
-               link2 = "log", method = "L-BFGS-B")
+fit1 <- ptsr.fit(
+  start = c(0, 0, 0, 10), yt = simu$yt,
+  fit.alpha = TRUE, p = 1, q = 1,
+  ddist = d.gamma, link1 = "log",
+  link2 = "log", method = "L-BFGS-B"
+)
 summary(fit1)
 
 # removing alpha from the model
-fit2 = ptsr.fit(start =  c(0,0,10), yt = simu$yt,
-               fit.alpha = FALSE, p = 1, q = 1,
-               ddist = d.gamma, link1 = "log",
-               link2 = "log", method = "L-BFGS-B")
+fit2 <- ptsr.fit(
+  start = c(0, 0, 10), yt = simu$yt,
+  fit.alpha = FALSE, p = 1, q = 1,
+  ddist = d.gamma, link1 = "log",
+  link2 = "log", method = "L-BFGS-B"
+)
 summary(fit2)
 
 }

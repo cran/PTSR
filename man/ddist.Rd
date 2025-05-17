@@ -67,27 +67,33 @@ r.ray(n, mu, ...)
 \item{...}{for compatibility with other functions}
 }
 \value{
-For any avaliable \code{dist}, \code{ddist} gives the density and \code{rdist} generates random deviates.
+For any avaliable \code{dist}, \code{ddist} gives the density and
+\code{rdist} generates random deviates.
 
-The length of the result is determined by \code{n} for \code{rdist}, and is the maximum of the lengths of the numerical arguments for \code{rdist}.
+The length of the result is determined by \code{n} for \code{rdist}, and is
+the maximum of the lengths of the numerical arguments for \code{rdist}.
 
-The numerical arguments other than \code{n} are recycled to the length of the result. Only the first elements of the logical arguments are used.
+The numerical arguments other than \code{n} are recycled to the length of the
+result. Only the first elements of the logical arguments are used.
 }
 \description{
-Density function and random numbers generation for models with support on the positive real line.
+Density function and random numbers generation for models with support on the
+positive real line.
 }
 \details{
-
-
 \itemize{
-\item For the reparametrized Beta-Prime distribution, the functions \link[extraDistr:BetaPrime]{dbetapr} and \link[extraDistr:BetaPrime]{rbetapr} are imported from the package \code{\link{extraDistr}}. The following holds
+\item For the reparametrized Beta-Prime distribution, the functions
+\link[extraDistr:BetaPrime]{dbetapr} and \link[extraDistr:BetaPrime]{rbetapr} are
+imported from the \code{extraDistr} package. The following holds
 \deqn{shape1 = mu*varphi}
 \deqn{shape2 = varphi + 1}
 \deqn{scale = 1}
 }
 
 \itemize{
-\item For the reparametrized F distribution, the functions \link[stats:Fdist]{df} and  \link[stats:Fdist]{rf} are imported from \code{\link{stats}}. The following holds
+\item For the reparametrized F distribution, the functions \link[stats:Fdist]{df}
+and  \link[stats:Fdist]{rf} are imported from \code{\link{stats}}. The following
+holds
 \deqn{df1 = varphi}
 \deqn{df2 = 2*mu/(mu - 1)}
 so that the parameter \eqn{\mu} must satisfy \eqn{\mu > 1}.
@@ -100,30 +106,41 @@ so that the parameter \eqn{\mu} must satisfy \eqn{\mu > 1}.
 }
 
 \itemize{
-\item For the reparametrized Inverse Gaussian distribution, the functions \link[SuppDists:invGauss]{dinvGauss} and \link[SuppDists:invGauss]{rinvGauss} are imported from \code{SuppDists}. The following holds
+\item For the reparametrized Inverse Gaussian distribution, the functions
+\link[SuppDists:invGauss]{dinvGauss} and \link[SuppDists:invGauss]{rinvGauss} are
+imported from the \code{SuppDists} package. The following holds
 \deqn{nu = mu}
 \deqn{lambda = 1/varphi}
 }
 
 \itemize{
-\item For the reparametrized Log-logistic distribution, the functions \link[actuar:Loglogistic]{dllogis} and \link[actuar:Loglogistic]{rllogis} a are imported from \code{actuar}. The following holds
+\item For the reparametrized Log-logistic distribution, the functions
+\link[actuar:Loglogistic]{dllogis} and \link[actuar:Loglogistic]{rllogis} a are imported
+from the \code{actuar} package. The following holds
 \deqn{shape = varphi}
 \deqn{rate = (pi/varphi)/(mu*sin(pi/varphi))}
 }
 
 \itemize{
-\item For the reparametrized Log-Normal distribution, the functions \link[stats:Lognormal]{dlnorm} and \link[stats:Lognormal]{rlnorm} are imported from \code{\link{stats}}. The following holds
+\item For the reparametrized Log-Normal distribution, the functions
+\link[stats:Lognormal]{dlnorm} and \link[stats:Lognormal]{rlnorm} are imported from
+\code{\link{stats}}. The following holds
 \deqn{meanlog = log(mu) - varphi^2/2}
 \deqn{sdlog = varphi}
 }
 
 \itemize{
-\item For the reparametrized Chi-squared F distribution, the functions \link[stats:Chisquare]{dchisq} and \link[stats:Chisquare]{rchisq} are imported from \code{\link{stats}}. The following holds
+\item For the reparametrized Chi-squared F distribution, the functions
+\link[stats:Chisquare]{dchisq} and \link[stats:Chisquare]{rchisq} are imported from
+\code{\link{stats}}. The following holds
 \deqn{df = mu}
 }
 
 \itemize{
-\item For the reparametrized Rayleigh distribution, the functions \link[extraDistr:Rayleigh]{drayleigh} and \link[extraDistr:Rayleigh]{rrayleigh} are imported from \code{\link{extraDistr}}. The following holds
-\deqn{sigma = mu/sqrt(pi/2)}
+\item For the reparametrized Rayleigh distribution, the functions
+\link[extraDistr:Rayleigh]{drayleigh} and \link[extraDistr:Rayleigh]{rrayleigh}
+are imported from \code{extraDistr} package. The following holds
+\deqn{
+  sigma = mu/sqrt(pi/2)}
 }
 }

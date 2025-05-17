@@ -60,8 +60,6 @@ The inverse ov the information matrix.}
 \code{summary} method for class \code{"ptsr"}.
 }
 \details{
-
-
 \code{print.summary.btsr} tries to be smart about formatting the
 coefficients, standard errors, etc. and additionally provides
 \sQuote{significance stars}.

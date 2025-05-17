@@ -32,7 +32,8 @@ A list with the following arguments
 
  \item{error}{The error term}
 
- \item{residuals}{The (in-sample) residuals, that is, the observed minus the predicted values.}
+ \item{residuals}{The (in-sample) residuals, that is, the observed minus the
+ predicted values.}
 
  \item{forecast}{The predicted values for yt.}
 }

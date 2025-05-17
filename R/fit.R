@@ -2,10 +2,9 @@
 #  extracts mu(t) and eps(t)
 .extract <- function(par, a, xreg, xregar, b, yt, p, q, arlag, malag,
                      ddist, g1, g1.inv, g2) {
-
   n <- length(yt)
   mut <- numeric(n)
-  epst  <- numeric(n + q)
+  epst <- numeric(n + q)
 
   # adding initial values for yt.
   # Using the unconditional mean
@@ -14,19 +13,24 @@
 
   alpha <- 0
   beta <- 0
-  l <- 0       # counter
+  l <- 0 # counter
 
   # alpha
-  if (a == 1) {alpha <- par[1]; l <- l + 1}
+  if (a == 1) {
+    alpha <- par[1]
+    l <- l + 1
+  }
   # beta
-  if (b > 0) {beta <- par[(l + 1):(l + b)]; l <- l + b}
+  if (b > 0) {
+    beta <- par[(l + 1):(l + b)]
+    l <- l + b
+  }
   # ar
   if (p > 0) {
     if (is.null(arlag)) {
       phi <- par[(l + 1):(l + p)]
       l <- l + p
-    }
-    else {
+    } else {
       phi <- numeric(p)
       phi[arlag] <- par[(l + 1):(l + length(arlag))]
       l <- l + length(arlag)
@@ -37,8 +41,7 @@
     if (is.null(arlag)) {
       theta <- par[(l + 1):(l + q)]
       l <- l + q
-    }
-    else {
+    } else {
       theta <- numeric(q)
       theta[malag] <- par[(l + 1):(l + length(malag))]
       l <- l + length(malag)
@@ -48,19 +51,19 @@
   # X*beta
   XB <- numeric(n)
   if (!is.null(xreg)) XB <- xreg %*% beta
-  if(p > 0){
+  if (p > 0) {
     # setting the initial p values as the unconditional mean
-    if(xregar)	XB = c(rep(mean(XB[1:p]),p), XB)
+    if (xregar) XB <- c(rep(mean(XB[1:p]), p), XB)
   }
 
   # starting the loop to calculate mu(t) and eps(t)
   for (t in 1:n) {
-    ls <- alpha + XB[t+p]
+    ls <- alpha + XB[t + p]
 
     # shift on t to compensate for "p" and "q"
-    if (p > 0){
-      xr = 0
-      if(xregar) xr = XB[(p + t) - c(1:p)]
+    if (p > 0) {
+      xr <- 0
+      if (xregar) xr <- XB[(p + t) - c(1:p)]
       ls <- ls + sum(phi * (g2y[(p + t) - c(1:p)] - xr))
     }
     if (q > 0) ls <- ls + sum(theta * epst[(q + t) - (1:q)])
@@ -69,14 +72,13 @@
     epst[q + t] <- yt[p + t] - mut[t]
   }
 
-  return(list(mut = mut, epst = epst[(q+1):(q+n)]))
-
+  return(list(mut = mut, epst = epst[(q + 1):(q + n)]))
 }
 
 # internal function
 # calculates the sum of the -log-likelihood
 # for a given distribution
-.ll <- function(x, mu, varphi, ddist){
+.ll <- function(x, mu, varphi, ddist) {
   ll <- sum(ddist(x, mu, varphi, log = TRUE))
   return(-ll)
 }
@@ -85,89 +87,116 @@
 #  internal function
 #  sum of the -log-likelihood for the selected model
 .loglike <- function(par, a, xreg, xregar, b, yt, p, q, arlag, malag,
-                     ddist, g1, g1.inv, g2){
-  temp <- .extract(par = par, a = a, xreg = xreg, xregar = xregar, b = b,
-                   yt = yt, p = p, q = q, arlag = arlag, malag = malag,
-                   ddist = ddist, g1 = g1, g1.inv = g1.inv, g2 = g2)
+                     ddist, g1, g1.inv, g2) {
+  temp <- .extract(
+    par = par, a = a, xreg = xreg, xregar = xregar, b = b,
+    yt = yt, p = p, q = q, arlag = arlag, malag = malag,
+    ddist = ddist, g1 = g1, g1.inv = g1.inv, g2 = g2
+  )
   # if ddist does not have a varphi parameter, this value will be
   # ignored by the function so there is no problem on setting varphi = par[length(par)]
   sll <- .ll(yt, mu = temp$mut, varphi = par[length(par)], ddist = ddist)
-	if(is.infinite(sll)) sll = ifelse(sll > 0, 2.2e+10, -2.2e+10)
-	if(is.nan(sll)) sll = 2.2e+10
+  if (is.infinite(sll)) sll <- ifelse(sll > 0, 2.2e+10, -2.2e+10)
+  if (is.nan(sll)) sll <- 2.2e+10
   return(sll)
 }
 
 #  internal function
 #  calculates the hessian matrix
-.hessian <- function(object, eps){
-
+.hessian <- function(object, eps) {
   temp <- object$model
   par <- object$coefficients
 
-  out = matrix(0, ncol = length(par), nrow = length(par))
-  for(k in 1:length(par)){
-    for(j in 1:k){
-
+  out <- matrix(0, ncol = length(par), nrow = length(par))
+  for (k in 1:length(par)) {
+    for (j in 1:k) {
       par1 <- par2 <- par3 <- par4 <- par
-      par1[k] = par1[k] + eps;  par1[j] = par1[j] + eps
-      par2[k] = par2[k] + eps;  par2[j] = par2[j] - eps
-      par3[k] = par3[k] - eps;  par3[j] = par3[j] + eps
-      par4[k] = par4[k] - eps;  par4[j] = par4[j] - eps
+      par1[k] <- par1[k] + eps
+      par1[j] <- par1[j] + eps
+      par2[k] <- par2[k] + eps
+      par2[j] <- par2[j] - eps
+      par3[k] <- par3[k] - eps
+      par3[j] <- par3[j] + eps
+      par4[k] <- par4[k] - eps
+      par4[j] <- par4[j] - eps
 
-      f1 <-  .loglike(par = par1, a = temp$a, xreg = object$xreg,
-                      xregar = temp$xregar, b = temp$b, yt = object$series,
-                      p = temp$p, q = temp$q, arlag = temp$arlag,
-                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
-                      g1.inv = temp$g1.inv, g2 = temp$g2)
+      f1 <- .loglike(
+        par = par1, a = temp$a, xreg = object$xreg,
+        xregar = temp$xregar, b = temp$b, yt = object$series,
+        p = temp$p, q = temp$q, arlag = temp$arlag,
+        malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+        g1.inv = temp$g1.inv, g2 = temp$g2
+      )
 
-      f2 <-  .loglike(par = par2, a = temp$a, xreg = object$xreg,
-                      xregar = temp$xregar, b = temp$b, yt = object$series,
-                      p = temp$p, q = temp$q, arlag = temp$arlag,
-                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
-                      g1.inv = temp$g1.inv, g2 = temp$g2)
+      f2 <- .loglike(
+        par = par2, a = temp$a, xreg = object$xreg,
+        xregar = temp$xregar, b = temp$b, yt = object$series,
+        p = temp$p, q = temp$q, arlag = temp$arlag,
+        malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+        g1.inv = temp$g1.inv, g2 = temp$g2
+      )
 
-      f3 <-  .loglike(par = par3, a = temp$a, xreg = object$xreg,
-                      xregar = temp$xregar, b = temp$b, yt = object$series,
-                      p = temp$p, q = temp$q, arlag = temp$arlag,
-                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
-                      g1.inv = temp$g1.inv, g2 = temp$g2)
+      f3 <- .loglike(
+        par = par3, a = temp$a, xreg = object$xreg,
+        xregar = temp$xregar, b = temp$b, yt = object$series,
+        p = temp$p, q = temp$q, arlag = temp$arlag,
+        malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+        g1.inv = temp$g1.inv, g2 = temp$g2
+      )
 
-      f4 <-  .loglike(par = par4, a = temp$a, xreg = object$xreg,
-                      xregar = temp$xregar, b = temp$b, yt = object$series,
-                      p = temp$p, q = temp$q, arlag = temp$arlag,
-                      malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
-                      g1.inv = temp$g1.inv, g2 = temp$g2)
+      f4 <- .loglike(
+        par = par4, a = temp$a, xreg = object$xreg,
+        xregar = temp$xregar, b = temp$b, yt = object$series,
+        p = temp$p, q = temp$q, arlag = temp$arlag,
+        malag = temp$malag, ddist = temp$ddist, g1 = temp$g1,
+        g1.inv = temp$g1.inv, g2 = temp$g2
+      )
 
-      out[k,j] = out[j,k] = (f1 - f2 -f3 + f4)/(4*eps^2)
+      out[k, j] <- out[j, k] <- (f1 - f2 - f3 + f4) / (4 * eps^2)
     }
   }
   out
 }
 
-#' Title Function to fit a PTSR model
+#' @title Function to fit a PTSR model
+#'
+#' @description
+#' Fit a PTSR model to a univariate time series.
+#'
 #'
 #' @param start a vector with the starting values for the non-fixed coefficients
-#'  of the model.
+#'   of the model.
 #' @param yt the time series
-#' @param xreg optionally, a vector or matrix of external regressors. Default is \code{NULL}
-#' @param xregar logical, if \code{FALSE}, the regressors are not included in the
-#' AR component of the model. Default is \code{TRUE}.
-#' @param fit.alpha logical, if FALSE, alpha is set to zero. Default is \code{TRUE}
+#' @param xreg optionally, a vector or matrix of external regressors. Default is
+#'   \code{NULL}
+#' @param xregar logical, if \code{FALSE}, the regressors are not included in
+#'   the AR component of the model. Default is \code{TRUE}.
+#' @param fit.alpha logical, if FALSE, alpha is set to zero. Default is
+#'   \code{TRUE}
 #' @param p order of the AR polinomial
 #' @param q order of the MA polinomial
-#' @param arlag the lags to be included in the AR polinomial. Default is \code{NULL}, meaning that all lags will be included.
-#' @param malag the lags to be included in the MA polinomial. Default is \code{NULL}, meaning that all lags will be included.
+#' @param arlag the lags to be included in the AR polinomial. Default is
+#'   \code{NULL}, meaning that all lags will be included.
+#' @param malag the lags to be included in the MA polinomial. Default is
+#'   \code{NULL}, meaning that all lags will be included.
 #' @param ddist function, the density function to be used
-#' @param link1 character indicating which link must be used for \eqn{\mu_t}.  See \code{\link{ptsr.link}} for available links. Default is \sQuote{log}.
-#' @param link2 character indicating which link must be used for \eqn{y_t} in the AR recursion.  See \code{\link{ptsr.link}} for available links. Default is \sQuote{identity}.
-#' @param g1 optionally, a link function to be used  for \eqn{\mu_t}. Default is \code{NULL}, so that it is calculated internally, using \code{link1}.
-#' @param g1.inv optionally, a the inverse link function to be used  for \eqn{\eta_t}. It must the the ivnerse of \code{g1}. Default is \code{NULL}, so that it is calculated internally, using \code{link1}.
-#' @param g2 optionally, a link function to be used  for \eqn{y_t}. Default is \code{NULL}, so that it is calculated internally, using \code{link2}.
+#' @param link1 character indicating which link must be used for \eqn{\mu_t}.
+#'   See \code{\link{ptsr.link}} for available links. Default is \sQuote{log}.
+#' @param link2 character indicating which link must be used for \eqn{y_t} in
+#'   the AR recursion.  See \code{\link{ptsr.link}} for available links. Default
+#'   is \sQuote{identity}.
+#' @param g1 optionally, a link function to be used  for \eqn{\mu_t}. Default is
+#'   \code{NULL}, so that it is calculated internally, using \code{link1}.
+#' @param g1.inv optionally, a the inverse link function to be used  for
+#'   \eqn{\eta_t}. It must the the ivnerse of \code{g1}. Default is \code{NULL},
+#'   so that it is calculated internally, using \code{link1}.
+#' @param g2 optionally, a link function to be used  for \eqn{y_t}. Default is
+#'   \code{NULL}, so that it is calculated internally, using \code{link2}.
 #' @param method  The method to be used. See [optim][stats::optim] for details.
 #' @param ... Further arguments to be passed to \code{optim}.
 #'
 #' @return
-#' The same arguments return by \code{optim} plus a the  following arguments
+#' The same arguments return by \code{optim} plus the following arguments
 #' \itemize{
 #'    \item \code{coefficients}: a vector with the estimated coefficients;
 #'    \item \code{sll}: the sum of the log-likelihood for the fitted model;
@@ -185,86 +214,96 @@
 #' # Gamma-ARMA(1,1) model with no regressors
 #' #-------------------------------------------------------------------
 #'
-#' simu = ptsr.sim(n = 3000, burn = 50,
-#'                 varphi = 20, alpha = 0,
-#'                 phi = 0.35, theta = 0.2,
-#'                 seed = 1234, rdist = r.gamma,
-#'                 link1 = "log", link2 = "log")
+#' simu <- ptsr.sim(
+#'   n = 3000, burn = 50,
+#'   varphi = 20, alpha = 0,
+#'   phi = 0.35, theta = 0.2,
+#'   seed = 1234, rdist = r.gamma,
+#'   link1 = "log", link2 = "log"
+#' )
 #'
-#' fit1 = ptsr.fit(start =  c(0,0,0,10), yt = simu$yt,
-#'                fit.alpha = TRUE, p = 1, q = 1,
-#'                ddist = d.gamma, link1 = "log",
-#'                link2 = "log", method = "L-BFGS-B")
+#' fit1 <- ptsr.fit(
+#'   start = c(0, 0, 0, 10), yt = simu$yt,
+#'   fit.alpha = TRUE, p = 1, q = 1,
+#'   ddist = d.gamma, link1 = "log",
+#'   link2 = "log", method = "L-BFGS-B"
+#' )
 #' summary(fit1)
 #'
 #' # removing alpha from the model
-#' fit2 = ptsr.fit(start =  c(0,0,10), yt = simu$yt,
-#'                fit.alpha = FALSE, p = 1, q = 1,
-#'                ddist = d.gamma, link1 = "log",
-#'                link2 = "log", method = "L-BFGS-B")
+#' fit2 <- ptsr.fit(
+#'   start = c(0, 0, 10), yt = simu$yt,
+#'   fit.alpha = FALSE, p = 1, q = 1,
+#'   ddist = d.gamma, link1 = "log",
+#'   link2 = "log", method = "L-BFGS-B"
+#' )
 #' summary(fit2)
 #'
 #' @export
-ptsr.fit <- function(start, yt,  xreg = NULL, xregar = TRUE,
+ptsr.fit <- function(start, yt, xreg = NULL, xregar = TRUE,
                      fit.alpha = TRUE, p = 0, q = 0,
                      arlag = NULL, malag = NULL,
                      ddist = d.gamma, link1 = "log", link2 = "identity",
                      g1 = NULL, g1.inv = NULL, g2 = NULL,
-                     method = "L-BFGS-B",...){
-
+                     method = "L-BFGS-B", ...) {
   # par = c(alpha, beta, phi, theta, varphi) if ddist has 2 parameters
   # par = c(alpha, beta, phi, theta) if ddist only has mu
 
   # function to be applied to mu(t) and eta(t)
-  if(is.null(g1) | is.null(g1.inv)){
+  if (is.null(g1) | is.null(g1.inv)) {
     lk1 <- ptsr.link(link = link1)
     g1 <- lk1$linkfun
     g1.inv <- lk1$linkinv
   }
 
   # function to be applied to y(t)
-  if(is.null(g2)) {
-		lk2 <- ptsr.link(link = link2)
-		g2 <- lk2$linkfun
-		}
+  if (is.null(g2)) {
+    lk2 <- ptsr.link(link = link2)
+    g2 <- lk2$linkfun
+  }
 
   b <- 0
-  if(!is.null(xreg)){
+  if (!is.null(xreg)) {
     xreg <- as.matrix(xreg)
     b <- ncol(xreg)
   }
 
-  temp <- stats::optim(par = start, fn = .loglike,
-                       a = as.integer(fit.alpha),
-                       xreg = xreg, xregar = xregar, b = b, yt = yt,
-                       p = p, q = q, arlag = arlag, malag = malag,
-                       ddist = ddist, g1 = g1, g1.inv = g1.inv, g2 = g2,
-                       method = method,...)
+  temp <- stats::optim(
+    par = start, fn = .loglike,
+    a = as.integer(fit.alpha),
+    xreg = xreg, xregar = xregar, b = b, yt = yt,
+    p = p, q = q, arlag = arlag, malag = malag,
+    ddist = ddist, g1 = g1, g1.inv = g1.inv, g2 = g2,
+    method = method, ...
+  )
 
-  final <- .extract(par = temp$par, a = as.integer(fit.alpha),
-                    xreg = xreg, xregar = xregar, b = b, yt = yt,
-                    p = p, q = q, arlag = arlag, malag = malag,
-                    ddist = ddist, g1 = g1, g1.inv = g1.inv, g2 = g2)
+  final <- .extract(
+    par = temp$par, a = as.integer(fit.alpha),
+    xreg = xreg, xregar = xregar, b = b, yt = yt,
+    p = p, q = q, arlag = arlag, malag = malag,
+    ddist = ddist, g1 = g1, g1.inv = g1.inv, g2 = g2
+  )
 
   out <- c()
   out$optim <- temp
-  out$model <- list(a = as.integer(fit.alpha),
-                    b = b, xregar = xregar, p = p, q = q,
-                    arlag = arlag, malag = malag,
-                    g1 = g1, g1.inv = g1.inv, g2 = g2,
-                    ddist = ddist)
+  out$model <- list(
+    a = as.integer(fit.alpha),
+    b = b, xregar = xregar, p = p, q = q,
+    arlag = arlag, malag = malag,
+    g1 = g1, g1.inv = g1.inv, g2 = g2,
+    ddist = ddist
+  )
 
   out$coefficients <- temp$par
   out$sll <- -temp$value
   out$series <- yt
   out$xreg <- NULL
-  if(b > 0) out$xreg <- xreg
+  if (b > 0) out$xreg <- xreg
   out$fitted.values <- final$mut
   out$residuals <- final$epst
 
   class(out) <- c("ptsr", class(out))
   invisible(out)
-
 }
 
 
@@ -280,8 +319,6 @@ ptsr.fit <- function(start, yt,  xreg = NULL, xregar = TRUE,
 #'
 #' @param object object of class \code{"ptsr"}.
 #' @param ... further arguments passed to or from other methods.
-#'
-#' @details
 #'
 #' @return
 #' The function \code{summary.ptsr} computes and returns a list
@@ -318,30 +355,34 @@ ptsr.fit <- function(start, yt,  xreg = NULL, xregar = TRUE,
 #'
 #' @export
 #' @md
-summary.ptsr <- function(object,...) {
-
-  if(!"ptsr" %in% class(object))
+summary.ptsr <- function(object, ...) {
+  if (!"ptsr" %in% class(object)) {
     stop("the argument 'object' must be a 'ptsr' object")
+  }
 
   temp <- object$model
 
   # calculates the numerical hessian
-  hs <- numDeriv::hessian(func = .loglike, x = object$coefficients,
-                          yt = object$series, a = temp$a,
-                          xreg = object$xreg, xregar = temp$xregar,
-                          b = temp$b, p = temp$p, q = temp$q,
-                          arlag = temp$arlag, malag = temp$malag,
-                          ddist = temp$ddist, g1 = temp$g1,
-                          g1.inv = temp$g1.inv, g2 = temp$g2)
-  sv <- try(solve(hs), silent=TRUE)
+  hs <- numDeriv::hessian(
+    func = .loglike, x = object$coefficients,
+    yt = object$series, a = temp$a,
+    xreg = object$xreg, xregar = temp$xregar,
+    b = temp$b, p = temp$p, q = temp$q,
+    arlag = temp$arlag, malag = temp$malag,
+    ddist = temp$ddist, g1 = temp$g1,
+    g1.inv = temp$g1.inv, g2 = temp$g2
+  )
+  sv <- try(solve(hs), silent = TRUE)
   if ("try-error" %in% class(sv)) {
-	  cat("\n----------------\n",
-		"numDeriv::hessian failed.\n",
-		"Using .hessian from PTSR instead.\n",
-		"----------------\n")
+    cat(
+      "\n----------------\n",
+      "numDeriv::hessian failed.\n",
+      "Using .hessian from PTSR instead.\n",
+      "----------------\n"
+    )
     hs <- .hessian(object, eps = 1e-4)
     sv <- try(solve(hs))
-    if ("try-error" %in% class(sv)){
+    if ("try-error" %in% class(sv)) {
       print("Error calculating the inverse - Returning the hessian matrix")
       return(hs)
     }
@@ -351,59 +392,60 @@ summary.ptsr <- function(object,...) {
   ans <- c()
   ans$residuals <- object$residuals
   n <- length(object$residuals)
-  rdf <- ans$df.residuals <- n-npar
-  ans$sigma.res <- sqrt(sum(ans$residuals^2)/rdf)
+  rdf <- ans$df.residuals <- n - npar
+  ans$sigma.res <- sqrt(sum(ans$residuals^2) / rdf)
   class(ans) <- "summary.ptsr"
 
-  ans$df = c(npar, rdf)
+  ans$df <- c(npar, rdf)
   ans$vcov <- sv
   stderror <- sqrt(diag(abs(ans$vcov)))
-  zstat <- abs(object$coefficients/stderror)
-  ans$coefficients <- cbind(Estimate = object$coefficients,
-                            `Std. Error` = stderror,
-                            `z value` = zstat,
-                            `Pr(>|t|)` = 2*(1 - pnorm(zstat)))
+  zstat <- abs(object$coefficients / stderror)
+  ans$coefficients <- cbind(
+    Estimate = object$coefficients,
+    `Std. Error` = stderror,
+    `z value` = zstat,
+    `Pr(>|t|)` = 2 * (1 - pnorm(zstat))
+  )
 
-  nms = NULL
-  if (temp$a > 0 ) nms = c("alpha")
-  if (temp$b > 0 ) nms = c(nms, paste("beta(",1:temp$b,")", sep = ""))
+  nms <- NULL
+  if (temp$a > 0) nms <- c("alpha")
+  if (temp$b > 0) nms <- c(nms, paste("beta(", 1:temp$b, ")", sep = ""))
   ptemp <- 0
   if (temp$p > 0) {
-    lags = 1:temp$p
+    lags <- 1:temp$p
     ptemp <- temp$p
-    if (!is.null(temp$arlag)){
+    if (!is.null(temp$arlag)) {
       lags <- temp$arlag
       ptemp <- length(lags)
     }
-    nms <- c(nms, paste("ar(",lags,")", sep = ""))
+    nms <- c(nms, paste("ar(", lags, ")", sep = ""))
   }
   qtemp <- 0
   if (temp$q > 0) {
     lags <- 1:temp$q
     qtemp <- temp$q
-    if (!is.null(temp$malag)){
+    if (!is.null(temp$malag)) {
       lags <- temp$malag
       qtemp <- length(lags)
     }
-    nms <- c(nms, paste("ma(",lags,")", sep = ""))
+    nms <- c(nms, paste("ma(", lags, ")", sep = ""))
   }
   np <- temp$a + temp$b + ptemp + qtemp
-  nphi = 0
-  if (length(object$coefficients) > np){
+  nphi <- 0
+  if (length(object$coefficients) > np) {
     nms <- c(nms, "varphi")
-    nphi = 1
+    nphi <- 1
   }
   np <- temp$a + temp$b + temp$p + temp$q + nphi
-  ans$df = c(npar, rdf, np)
+  ans$df <- c(npar, rdf, np)
   rownames(ans$coefficients) <- nms
 
   ans$loglik <- object$sll
-  ans$aic <- -2*ans$loglik+2*npar
-  ans$bic <- -2*ans$loglik + log(n)*npar
-  ans$hq <- -2*ans$loglik + log(log(n))*npar
+  ans$aic <- -2 * ans$loglik + 2 * npar
+  ans$bic <- -2 * ans$loglik + log(n) * npar
+  ans$hq <- -2 * ans$loglik + log(log(n)) * npar
   ans$coefficients
   return(ans)
-
 }
 
 
@@ -427,14 +469,15 @@ summary.ptsr <- function(object,...) {
 #'
 #' @export
 #'
-print.ptsr <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
-{
-
-  if(length(coef(x))) {
+print.ptsr <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
+  if (length(coef(x))) {
     cat("Coefficients:\n")
     print.default(format(coef(x), digits = digits),
-                  print.gap = 2L, quote = FALSE)
-  } else cat("No coefficients\n")
+      print.gap = 2L, quote = FALSE
+    )
+  } else {
+    cat("No coefficients\n")
+  }
   cat("\n")
   invisible(x)
 }
@@ -459,29 +502,29 @@ print.ptsr <- function(x, digits = max(3L, getOption("digits") - 3L), ...)
 #' \sQuote{significance stars}.
 #'
 #' @export
-print.summary.ptsr <- function (x, digits = max(3L, getOption("digits") - 3L),
-                                signif.stars = getOption("show.signif.stars"),	...)
-{
-
+print.summary.ptsr <- function(x, digits = max(3L, getOption("digits") - 3L),
+                               signif.stars = getOption("show.signif.stars"), ...) {
   resid <- x$residuals
   df <- x$df
   rdf <- df[2L]
   cat("\n")
   cat("-----------------------------------------------")
   cat("\nCall:\n",
-      "Positive Time Serie Regression Model", "\n\n", sep = "")
+    "Positive Time Series Regression Model", "\n\n",
+    sep = ""
+  )
   if (rdf > 5L) {
     nam <- c("Min", "1Q", "Median", "3Q", "Max")
-    rq <- if (length(dim(resid)) == 2L)
+    rq <- if (length(dim(resid)) == 2L) {
       structure(apply(t(resid), 1L, quantile),
-                dimnames = list(nam, dimnames(resid)[[2L]]))
-    else  {
+        dimnames = list(nam, dimnames(resid)[[2L]])
+      )
+    } else {
       zz <- zapsmall(quantile(resid), digits + 1L)
       structure(zz, names = nam)
     }
     print(rq, digits = digits, ...)
-  }
-  else if (rdf > 0L) {
+  } else if (rdf > 0L) {
     print(resid, digits = digits, ...)
   } else { # rdf == 0 : perfect fit!
     cat("ALL", df[1L], "residuals are 0: no residual degrees of freedom!")
@@ -489,11 +532,15 @@ print.summary.ptsr <- function (x, digits = max(3L, getOption("digits") - 3L),
   }
   cat("\nCoefficients:\n")
   coefs <- x$coefficients
-  printCoefmat(coefs, digits = digits, signif.stars = signif.stars,
-               na.print = "NA", ...)
+  printCoefmat(coefs,
+    digits = digits, signif.stars = signif.stars,
+    na.print = "NA", ...
+  )
   ##
-  cat("\nResidual standard error:",
-      format(signif(x$sigma, digits)), "on", rdf, "degrees of freedom")
+  cat(
+    "\nResidual standard error:",
+    format(signif(x$sigma, digits)), "on", rdf, "degrees of freedom"
+  )
   cat("\n")
   cat("-----------------------------------------------\n")
   cat("\n")

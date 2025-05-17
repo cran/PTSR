@@ -40,21 +40,28 @@ Default is \code{NULL}.}
  Default is \code{NULL}.
 that \eqn{g_2(y_t) = 0}, for \eqn{t < 1}.}
 
-\item{seed}{optionally, an integer which gives the value of the fixed
-seed to be used by the random number generator. If missing, a random integer
-is chosen uniformly from 1,000 to 10,000.}
+\item{seed}{optionally, an integer which gives the value of the fixed seed to
+be used by the random number generator. If missing, a random integer is
+chosen uniformly from 1,000 to 10,000.}
 
 \item{rdist}{function, the random number generator to be used}
 
-\item{link1}{character indicating which link must be used for \eqn{\mu_t}.  See \code{\link{ptsr.link}} for available links. Default is \sQuote{log}.}
+\item{link1}{character indicating which link must be used for \eqn{\mu_t}.
+See \code{\link{ptsr.link}} for available links. Default is \sQuote{log}.}
 
-\item{link2}{character indicating which link must be used for \eqn{y_t} in the AR recursion.  See \code{\link{ptsr.link}} for available links. Default is \sQuote{identity}.}
+\item{link2}{character indicating which link must be used for \eqn{y_t} in
+the AR recursion.  See \code{\link{ptsr.link}} for available links. Default
+is \sQuote{identity}.}
 
-\item{g1}{optionally, a link function to be used  for \eqn{\mu_t}. Default is \code{NULL}, so that it is calculated internally, using \code{link1}.}
+\item{g1}{optionally, a link function to be used  for \eqn{\mu_t}. Default is
+\code{NULL}, so that it is calculated internally, using \code{link1}.}
 
-\item{g1.inv}{optionally, a the inverse link function to be used  for \eqn{\eta_t}. It must the the ivnerse of \code{g1}. Default is \code{NULL}, so that it is calculated internally, using \code{link1}.}
+\item{g1.inv}{optionally, a the inverse link function to be used  for
+\eqn{\eta_t}. It must the the ivnerse of \code{g1}. Default is \code{NULL},
+so that it is calculated internally, using \code{link1}.}
 
-\item{g2}{optionally, a link function to be used  for \eqn{y_t}. Default is \code{NULL}, so that it is calculated internally, using \code{link2}.}
+\item{g2}{optionally, a link function to be used  for \eqn{y_t}. Default is
+\code{NULL}, so that it is calculated internally, using \code{link2}.}
 }
 \value{
 Returns a list with the following components
@@ -83,14 +90,16 @@ series regression model, with a given distribution.
 # Generating a sample of a Gamma-ARMA(1,1) model with no regressors
 #-------------------------------------------------------------------
 
-simu = ptsr.sim(n = 300, burn = 50,
-                varphi = 20, alpha = 0,
-                phi = 0.35, theta = 0.2,
-                seed = 1234, rdist = r.gamma,
-                link1 = "log", link2 = "log")
+simu <- ptsr.sim(
+  n = 300, burn = 50,
+  varphi = 20, alpha = 0,
+  phi = 0.35, theta = 0.2,
+  seed = 1234, rdist = r.gamma,
+  link1 = "log", link2 = "log"
+)
 
 names(simu)
 plot.ts(simu$yt)
-lines(simu$mut, col= "red")
+lines(simu$mut, col = "red")
 
 }
